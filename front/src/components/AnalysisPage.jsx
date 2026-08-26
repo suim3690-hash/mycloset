@@ -45,6 +45,7 @@ export default function AnalysisPage({ token }) {
   return (
     <AnalysisGallery
       outfits={outfits}
+      token={token}
       onSelect={openDetail}
       onOpenInsight={() => setView('insight')}
       onOpenStylist={() => setView('stylist')}

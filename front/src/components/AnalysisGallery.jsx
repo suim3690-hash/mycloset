@@ -1,9 +1,24 @@
 import { useMemo, useState } from 'react';
-import { photoUrl } from '../api/outfitApi';
+import { photoUrl, deleteOutfit } from '../api/outfitApi';
 import CaptureModal from './CaptureModal';
 
-export default function AnalysisGallery({ outfits, onSelect, onOpenInsight, onOpenStylist, onOutfitsChanged }) {
+export default function AnalysisGallery({ outfits, token, onSelect, onOpenInsight, onOpenStylist, onOutfitsChanged }) {
   const [captureOpen, setCaptureOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  async function handleDelete(e, outfit) {
+    e.stopPropagation();
+    if (!window.confirm('이 기록을 삭제할까요? 사진도 함께 삭제되고 되돌릴 수 없어요.')) return;
+    setDeletingId(outfit.id);
+    try {
+      await deleteOutfit(token, outfit.id);
+      onOutfitsChanged();
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const recentOutfits = useMemo(() => {
     const oneMonthAgo = new Date();
@@ -56,14 +71,20 @@ export default function AnalysisGallery({ outfits, onSelect, onOpenInsight, onOp
         {recentOutfits.length > 0 && (
           <div className="analysis-masonry">
             {recentOutfits.map((o) => (
-              <button
-                key={o.recordDate}
-                className="analysis-masonry-item"
-                onClick={() => onSelect(o.recordDate)}
-              >
-                <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
+              <div key={o.recordDate} className="analysis-masonry-item">
+                <button className="analysis-masonry-open-btn" onClick={() => onSelect(o.recordDate)}>
+                  <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
+                </button>
                 <span className="analysis-masonry-date">{o.recordDate.slice(5)}</span>
-              </button>
+                <button
+                  className="analysis-masonry-delete-btn"
+                  onClick={(e) => handleDelete(e, o)}
+                  disabled={deletingId === o.id}
+                  aria-label="삭제"
+                >
+                  <span className="material-symbol">delete</span>
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -72,6 +93,7 @@ export default function AnalysisGallery({ outfits, onSelect, onOpenInsight, onOp
       {captureOpen && (
         <CaptureModal
           date={new Date()}
+          token={token}
           onClose={() => setCaptureOpen(false)}
           onSaved={onOutfitsChanged}
         />

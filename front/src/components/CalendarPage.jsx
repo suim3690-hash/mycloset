@@ -3,9 +3,14 @@ import MonthGrid from './MonthGrid';
 import OutfitListView from './OutfitListView';
 import CaptureModal from './CaptureModal';
 import ShareSheet from './ShareSheet';
-import { fetchOutfits } from '../api/outfitApi';
+import { fetchMyOutfits } from '../api/outfitApi';
 
-export default function CalendarPage() {
+function parseRecordDate(recordDate) {
+  const [y, m, d] = recordDate.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export default function CalendarPage({ token }) {
   const [displayedMonth, setDisplayedMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -21,7 +26,7 @@ export default function CalendarPage() {
 
   async function loadOutfits() {
     try {
-      const data = await fetchOutfits();
+      const data = await fetchMyOutfits(token);
       setOutfits(data);
     } catch (e) {
       console.error(e);
@@ -89,7 +94,7 @@ export default function CalendarPage() {
             onDateClick={setModalDate}
           />
         ) : (
-          <OutfitListView outfits={outfits} />
+          <OutfitListView outfits={outfits} onItemClick={(recordDate) => setModalDate(parseRecordDate(recordDate))} />
         )}
       </div>
 
@@ -98,7 +103,7 @@ export default function CalendarPage() {
       </button>
 
       {modalDate && (
-        <CaptureModal date={modalDate} onClose={() => setModalDate(null)} onSaved={handleSaved} />
+        <CaptureModal date={modalDate} token={token} onClose={() => setModalDate(null)} onSaved={handleSaved} />
       )}
 
       {shareOpen && <ShareSheet onClose={() => setShareOpen(false)} />}

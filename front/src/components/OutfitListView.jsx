@@ -1,6 +1,6 @@
 import { photoUrl } from '../api/outfitApi';
 
-export default function OutfitListView({ outfits }) {
+export default function OutfitListView({ outfits, onItemClick }) {
   if (outfits.length === 0) {
     return (
       <div className="page-center">
@@ -12,13 +12,18 @@ export default function OutfitListView({ outfits }) {
   return (
     <div className="outfit-list">
       {outfits.map((outfit) => (
-        <div key={outfit.id} className="outfit-list-item">
+        <button
+          key={outfit.id}
+          type="button"
+          className="outfit-list-item"
+          onClick={() => onItemClick(outfit.recordDate)}
+        >
           <img src={photoUrl(outfit.photoPath)} alt="코디 사진" className="outfit-list-thumb" />
           <div className="outfit-list-info">
             <span className="outfit-list-date">{outfit.recordDate}</span>
             <span className="text-soft outfit-list-memo">{outfit.memo || '메모 없음'}</span>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );

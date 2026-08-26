@@ -81,6 +81,30 @@ public class AuthService {
         authMapper.deleteSession(token);
     }
 
+    public Long resolveUserId(String authorizationHeader) {
+        String token = extractToken(authorizationHeader);
+        return authMapper.findUserIdByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("로그인이 필요해요"));
+    }
+
+    public AppUser publicProfile(Long userId) {
+        AppUser user = authMapper.findUserById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없어요"));
+        AppUser publicUser = new AppUser();
+        publicUser.setId(user.getId());
+        publicUser.setDisplayName(user.getDisplayName());
+        publicUser.setBio(user.getBio());
+        publicUser.setAvatarPath(user.getAvatarPath());
+        return publicUser;
+    }
+
+    private String extractToken(String authorizationHeader) {
+        if (authorizationHeader == null) {
+            throw new IllegalArgumentException("로그인이 필요해요");
+        }
+        return authorizationHeader.replaceFirst("(?i)^Bearer\\s+", "");
+    }
+
     private AuthResponse issueSession(AppUser user) {
         String token = generateToken();
         authMapper.insertSession(new SessionRow(token, user.getId()));

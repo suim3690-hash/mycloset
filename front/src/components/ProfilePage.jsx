@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchOutfits, fetchSavedOutfits, photoUrl } from '../api/outfitApi';
+import { createPortal } from 'react-dom';
+import { fetchMyOutfits, fetchSavedOutfits, photoUrl } from '../api/outfitApi';
 import { fetchAllAnalysis } from '../api/analysisApi';
 import { updateProfile, logout } from '../api/authApi';
 import PreviewModal from './PreviewModal';
+import CaptureModal from './CaptureModal';
+import { CommunityCard } from './CommunityPage';
+
+function parseRecordDate(recordDate) {
+  const [y, m, d] = recordDate.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
 
 function parseBreakdown(raw) {
   try {
@@ -28,11 +36,21 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [gridTab, setGridTab] = useState('posts');
+  const [modalDate, setModalDate] = useState(null);
+  const [viewingSavedOutfit, setViewingSavedOutfit] = useState(null);
+
+  function loadOutfits() {
+    fetchMyOutfits(token).then(setOutfits).catch(() => setOutfits([]));
+  }
+
+  function loadSavedOutfits() {
+    fetchSavedOutfits().then(setSavedOutfits).catch(() => setSavedOutfits([]));
+  }
 
   useEffect(() => {
-    fetchOutfits().then(setOutfits).catch(() => setOutfits([]));
+    loadOutfits();
     fetchAllAnalysis().then(setAnalyses).catch(() => setAnalyses([]));
-    fetchSavedOutfits().then(setSavedOutfits).catch(() => setSavedOutfits([]));
+    loadSavedOutfits();
   }, []);
 
   const communityPosts = useMemo(
@@ -248,9 +266,14 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
           (communityPosts.length > 0 ? (
             <div className="profile-grid">
               {communityPosts.map((o) => (
-                <div key={o.id} className="profile-grid-item">
+                <button
+                  key={o.id}
+                  type="button"
+                  className="profile-grid-item"
+                  onClick={() => setModalDate(parseRecordDate(o.recordDate))}
+                >
                   <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -263,9 +286,14 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
           (savedOutfits && savedOutfits.length > 0 ? (
             <div className="profile-grid">
               {savedOutfits.map((o) => (
-                <div key={o.id} className="profile-grid-item">
+                <button
+                  key={o.id}
+                  type="button"
+                  className="profile-grid-item"
+                  onClick={() => setViewingSavedOutfit(o)}
+                >
                   <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -276,6 +304,33 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
       </div>
 
       {previewOpen && <PreviewModal onClose={() => setPreviewOpen(false)} />}
+
+      {modalDate && (
+        <CaptureModal
+          date={modalDate}
+          token={token}
+          onClose={() => setModalDate(null)}
+          onSaved={() => {
+            loadOutfits();
+            loadSavedOutfits();
+          }}
+        />
+      )}
+
+      {viewingSavedOutfit && createPortal(
+        <div className="modal-backdrop" onClick={() => setViewingSavedOutfit(null)}>
+          <div className="saved-outfit-preview" onClick={(e) => e.stopPropagation()}>
+            <CommunityCard
+              outfit={viewingSavedOutfit}
+              user={user}
+              token={token}
+              onViewUser={() => {}}
+              onChanged={loadSavedOutfits}
+            />
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ const QUICK_CATEGORIES = ['스트릿룩', '클래식룩', '미니멀룩'];
 const PAGE_SIZE = 6;
 const MAX_PAGES = 5;
 
-export default function MagazinePage() {
+export default function MagazinePage({ token }) {
   const [selected, setSelected] = useState(new Set());
   const [pickerOpen, setPickerOpen] = useState(false);
   const [articles, setArticles] = useState(undefined);
@@ -220,7 +220,7 @@ export default function MagazinePage() {
       )}
 
       {captureOpen && (
-        <CaptureModal date={new Date()} onClose={() => setCaptureOpen(false)} onSaved={() => setCaptureOpen(false)} />
+        <CaptureModal date={new Date()} token={token} onClose={() => setCaptureOpen(false)} onSaved={() => setCaptureOpen(false)} />
       )}
     </div>
   );

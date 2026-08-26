@@ -4,7 +4,7 @@ import { fetchDueTimeCapsules, markTimeCapsuleOpened } from '../api/timeCapsuleA
 import { fetchOutfitByDate, photoUrl } from '../api/outfitApi';
 import { toDateKey } from '../utils/date';
 
-export default function TimeCapsuleReveal() {
+export default function TimeCapsuleReveal({ token }) {
   const [queue, setQueue] = useState([]);
   const [current, setCurrent] = useState(null);
   const [pastOutfit, setPastOutfit] = useState(null);
@@ -23,8 +23,8 @@ export default function TimeCapsuleReveal() {
     }
     const next = queue[0];
     setCurrent(next);
-    fetchOutfitByDate(next.recordDate).then(setPastOutfit).catch(() => setPastOutfit(null));
-    fetchOutfitByDate(toDateKey(new Date())).then(setTodayOutfit).catch(() => setTodayOutfit(null));
+    fetchOutfitByDate(token, next.recordDate).then(setPastOutfit).catch(() => setPastOutfit(null));
+    fetchOutfitByDate(token, toDateKey(new Date())).then(setTodayOutfit).catch(() => setTodayOutfit(null));
   }, [queue]);
 
   if (!current) return null;

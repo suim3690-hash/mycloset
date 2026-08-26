@@ -5,6 +5,7 @@ import AnalysisPage from './components/AnalysisPage';
 import MagazinePage from './components/MagazinePage';
 import CommunityPage from './components/CommunityPage';
 import ProfilePage from './components/ProfilePage';
+import PublicProfile from './components/PublicProfile';
 import TimeCapsuleReveal from './components/TimeCapsuleReveal';
 import LoginPage from './components/LoginPage';
 import { fetchMe } from './api/authApi';
@@ -14,6 +15,7 @@ const TOKEN_KEY = 'mycloset_auth_token';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('calendar');
+  const [viewingUserId, setViewingUserId] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
   const [user, setUser] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
@@ -73,18 +75,31 @@ export default function App() {
         <span className="blob blob-peach" />
       </div>
       <div className="app-body">
-        {activeTab === 'calendar' && <CalendarPage />}
+        {activeTab === 'calendar' && <CalendarPage token={token} />}
         {activeTab === 'insight' && <AnalysisPage token={token} />}
-        {activeTab === 'magazine' && <MagazinePage />}
+        {activeTab === 'magazine' && <MagazinePage token={token} />}
         {activeTab === 'community' && (
-          <CommunityPage user={user} token={token} onOpenProfile={() => setActiveTab('profile')} />
+          <CommunityPage
+            user={user}
+            token={token}
+            onOpenProfile={() => setActiveTab('profile')}
+            onViewUser={(userId) => (userId === user.id ? setActiveTab('profile') : setViewingUserId(userId))}
+          />
         )}
         {activeTab === 'profile' && (
           <ProfilePage user={user} token={token} onProfileUpdated={setUser} onLogout={handleLogout} />
         )}
       </div>
       <BottomNav active={activeTab} onChange={setActiveTab} />
-      <TimeCapsuleReveal />
+      <TimeCapsuleReveal token={token} />
+      {viewingUserId && (
+        <PublicProfile
+          userId={viewingUserId}
+          currentUser={user}
+          token={token}
+          onClose={() => setViewingUserId(null)}
+        />
+      )}
     </div>
   );
 }

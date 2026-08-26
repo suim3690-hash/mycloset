@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FILTERS } from '../constants/filters';
-import { registerOutfit, fetchOutfitsByDateAll, setMainOutfit, updateOutfitDetails, photoUrl } from '../api/outfitApi';
+import { registerOutfit, fetchOutfitsByDateAll, setMainOutfit, updateOutfitDetails, deleteOutfit, photoUrl } from '../api/outfitApi';
 import { reverseGeocode, getCurrentLocation } from '../api/geoApi';
 import { LOOK_CATEGORIES } from '../constants/lookCategories';
 import { toDateKey } from '../utils/date';
@@ -90,7 +90,7 @@ function LocationInput({ location, onLocationChange, onUseMyLocation, isLocating
   );
 }
 
-export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
+export default function CaptureModal({ date, token, onClose, onSaved, initialMode }) {
   const dateKey = toDateKey(date);
 
   const [existingOutfits, setExistingOutfits] = useState(undefined);
@@ -114,13 +114,14 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
   const [editLocation, setEditLocation] = useState('');
   const [isEditLocating, setIsEditLocating] = useState(false);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [error, setError] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    fetchOutfitsByDateAll(dateKey)
+    fetchOutfitsByDateAll(token, dateKey)
       .then((list) => {
         if (cancelled) return;
         setExistingOutfits(list);
@@ -240,7 +241,7 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
     setIsSaving(true);
     setError(null);
     try {
-      const saved = await registerOutfit({
+      const saved = await registerOutfit(token, {
         recordDate: dateKey,
         filterType: filterKey,
         memo,
@@ -249,7 +250,7 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
         location,
         photoFile,
       });
-      const refreshed = await fetchOutfitsByDateAll(dateKey);
+      const refreshed = await fetchOutfitsByDateAll(token, dateKey);
       setExistingOutfits(refreshed);
       setMode('view');
       setPhotoFile(null);
@@ -273,13 +274,14 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
     setError(null);
     try {
       const updated = await updateOutfitDetails(
+        token,
         mainOutfit.id,
         editMemo,
         editItemTags.join(','),
         editLookCategories.join(','),
         editLocation,
       );
-      const refreshed = await fetchOutfitsByDateAll(dateKey);
+      const refreshed = await fetchOutfitsByDateAll(token, dateKey);
       setExistingOutfits(refreshed);
       setMode('view');
       onSaved(updated);
@@ -290,9 +292,28 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
     }
   }
 
+  async function handleDelete() {
+    if (!mainOutfit) return;
+    if (!window.confirm('이 기록을 삭제할까요? 사진도 함께 삭제되고 되돌릴 수 없어요.')) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      const remaining = await deleteOutfit(token, mainOutfit.id);
+      setExistingOutfits(remaining);
+      onSaved(remaining);
+      if (remaining.length === 0) {
+        onClose();
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   async function handleSetMain(id) {
     try {
-      const refreshed = await setMainOutfit(id, dateKey);
+      const refreshed = await setMainOutfit(token, id, dateKey);
       setExistingOutfits(refreshed);
       onSaved(refreshed);
     } catch (e) {
@@ -410,6 +431,11 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
               <button className="secondary-button" onClick={() => setMode('add')}>
                 <span className="material-symbol">add_a_photo</span>
                 사진 추가하기
+              </button>
+
+              <button className="report-btn-secondary danger" onClick={handleDelete} disabled={isDeleting}>
+                <span className="material-symbol">delete</span>
+                {isDeleting ? '삭제 중...' : '삭제하기'}
               </button>
             </>
           )}

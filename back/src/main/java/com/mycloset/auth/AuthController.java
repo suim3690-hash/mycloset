@@ -3,6 +3,7 @@ package com.mycloset.auth;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -34,6 +35,11 @@ public class AuthController {
     @GetMapping("/me")
     public AppUser me(@RequestHeader("Authorization") String authorization) {
         return authService.findBySessionToken(extractToken(authorization));
+    }
+
+    @GetMapping("/users/{id}")
+    public AppUser publicProfile(@PathVariable Long id) {
+        return authService.publicProfile(id);
     }
 
     @PostMapping("/profile")

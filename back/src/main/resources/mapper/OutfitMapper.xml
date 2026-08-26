@@ -4,7 +4,7 @@
 
     <sql id="columns">
         id, record_date, photo_path, filter_type, memo, is_main, item_tags,
-        look_category, location, like_count, is_liked, is_saved, created_at
+        look_category, location, like_count, is_liked, is_saved, created_at, user_id
     </sql>
 
     <insert id="insert" parameterType="com.mycloset.outfit.Outfit">
@@ -12,15 +12,25 @@
             SELECT nextval('outfit_record_seq')
         </selectKey>
         INSERT INTO outfit_record
-            (id, record_date, photo_path, filter_type, memo, is_main, item_tags, look_category, location, created_at)
+            (id, record_date, photo_path, filter_type, memo, is_main, item_tags, look_category, location, created_at, user_id)
         VALUES
-            (#{id}, #{recordDate}, #{photoPath}, #{filterType}, #{memo}, #{isMain}, #{itemTags}, #{lookCategory}, #{location}, now())
+            (#{id}, #{recordDate}, #{photoPath}, #{filterType}, #{memo}, #{isMain}, #{itemTags}, #{lookCategory}, #{location}, now(), #{userId})
     </insert>
 
     <select id="findAll" resultType="com.mycloset.outfit.Outfit">
+        SELECT o.id, o.record_date, o.photo_path, o.filter_type, o.memo, o.is_main, o.item_tags,
+               o.look_category, o.location, o.like_count, o.is_liked, o.is_saved, o.created_at, o.user_id,
+               u.display_name AS author_display_name, u.avatar_path AS author_avatar_path
+        FROM outfit_record o
+        LEFT JOIN app_user u ON u.id = o.user_id
+        WHERE o.is_main = 1
+        ORDER BY o.record_date DESC, o.id DESC
+    </select>
+
+    <select id="findAllByUserId" resultType="com.mycloset.outfit.Outfit">
         SELECT <include refid="columns" />
         FROM outfit_record
-        WHERE is_main = 1
+        WHERE is_main = 1 AND user_id = #{userId}
         ORDER BY record_date DESC, id DESC
     </select>
 
@@ -39,8 +49,27 @@
         ORDER BY is_main DESC, id ASC
     </select>
 
+    <select id="findByUserAndDate" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE user_id = #{userId} AND record_date = #{recordDate}
+        ORDER BY is_main DESC, id DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <select id="findAllByUserAndDate" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE user_id = #{userId} AND record_date = #{recordDate}
+        ORDER BY is_main DESC, id ASC
+    </select>
+
     <update id="clearMainForDate">
         UPDATE outfit_record SET is_main = 0 WHERE record_date = #{recordDate}
+    </update>
+
+    <update id="clearMainForUserAndDate">
+        UPDATE outfit_record SET is_main = 0 WHERE user_id = #{userId} AND record_date = #{recordDate}
     </update>
 
     <update id="setMainById">
@@ -95,5 +124,13 @@
         WHERE outfit_id = #{outfitId}
         ORDER BY created_at ASC
     </select>
+
+    <delete id="delete">
+        DELETE FROM outfit_record WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteCommentsByOutfitId">
+        DELETE FROM outfit_comment WHERE outfit_id = #{outfitId}
+    </delete>
 
 </mapper>

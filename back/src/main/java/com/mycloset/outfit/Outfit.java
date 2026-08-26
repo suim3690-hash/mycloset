@@ -24,4 +24,7 @@ public class Outfit {
     private Integer isLiked;
     private Integer isSaved;
     private LocalDateTime createdAt;
+    private Long userId;
+    private String authorDisplayName;
+    private String authorAvatarPath;
 }

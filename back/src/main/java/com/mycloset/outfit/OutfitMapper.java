@@ -13,11 +13,19 @@ public interface OutfitMapper {
 
     List<Outfit> findAll();
 
+    List<Outfit> findAllByUserId(Long userId);
+
     Optional<Outfit> findByDate(LocalDate recordDate);
 
     List<Outfit> findAllByDate(LocalDate recordDate);
 
+    Optional<Outfit> findByUserAndDate(@Param("userId") Long userId, @Param("recordDate") LocalDate recordDate);
+
+    List<Outfit> findAllByUserAndDate(@Param("userId") Long userId, @Param("recordDate") LocalDate recordDate);
+
     void clearMainForDate(LocalDate recordDate);
+
+    void clearMainForUserAndDate(@Param("userId") Long userId, @Param("recordDate") LocalDate recordDate);
 
     void setMainById(Long id);
 
@@ -34,4 +42,8 @@ public interface OutfitMapper {
     void insertComment(OutfitComment comment);
 
     List<OutfitComment> findCommentsByOutfitId(Long outfitId);
+
+    void delete(Long id);
+
+    void deleteCommentsByOutfitId(Long outfitId);
 }

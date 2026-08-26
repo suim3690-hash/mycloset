@@ -34,7 +34,8 @@ function renderCaption(memo) {
   );
 }
 
-function CommunityCard({ outfit, user, onOpenProfile, onChanged }) {
+export function CommunityCard({ outfit, user, token, onViewUser, onChanged }) {
+  const isOwner = user && outfit.userId === user.id;
   const [likeCount, setLikeCount] = useState(outfit.likeCount ?? 0);
   const [liked, setLiked] = useState(outfit.isLiked === 1);
   const [saved, setSaved] = useState(outfit.isSaved === 1);
@@ -108,9 +109,11 @@ function CommunityCard({ outfit, user, onOpenProfile, onChanged }) {
           </div>
         )}
 
-        <button className="community-edit-icon-btn" onClick={() => setEditOpen(true)} aria-label="수정">
-          <span className="material-symbol">edit</span>
-        </button>
+        {isOwner && (
+          <button className="community-edit-icon-btn" onClick={() => setEditOpen(true)} aria-label="수정">
+            <span className="material-symbol">edit</span>
+          </button>
+        )}
 
         {outfit.itemTags && (
           <div className="community-tag-overlay">
@@ -145,15 +148,15 @@ function CommunityCard({ outfit, user, onOpenProfile, onChanged }) {
       </div>
 
       <div className="community-post-meta">
-        <button className="community-post-user-btn" onClick={onOpenProfile}>
+        <button className="community-post-user-btn" onClick={() => onViewUser(outfit.userId)}>
           <span className="community-avatar">
-            {user?.avatarPath ? (
-              <img src={photoUrl(user.avatarPath)} alt={user.displayName} />
+            {outfit.authorAvatarPath ? (
+              <img src={photoUrl(outfit.authorAvatarPath)} alt={outfit.authorDisplayName} />
             ) : (
               <span className="material-symbol">checkroom</span>
             )}
           </span>
-          <span className="community-username">{user?.displayName ?? '나의 옷장'}</span>
+          <span className="community-username">{outfit.authorDisplayName ?? '나의 옷장'}</span>
         </button>
         <span className="community-time">
           {timeAgo(outfit.createdAt)}
@@ -201,6 +204,7 @@ function CommunityCard({ outfit, user, onOpenProfile, onChanged }) {
       {editOpen && (
         <CaptureModal
           date={parseRecordDate(outfit.recordDate)}
+          token={token}
           initialMode="edit"
           onClose={() => setEditOpen(false)}
           onSaved={onChanged}
@@ -210,7 +214,7 @@ function CommunityCard({ outfit, user, onOpenProfile, onChanged }) {
   );
 }
 
-export default function CommunityPage({ user, token, onOpenProfile }) {
+export default function CommunityPage({ user, token, onOpenProfile, onViewUser }) {
   const [outfits, setOutfits] = useState(undefined);
   const [selected, setSelected] = useState(new Set());
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -333,7 +337,8 @@ export default function CommunityPage({ user, token, onOpenProfile }) {
                 key={outfit.id}
                 outfit={outfit}
                 user={user}
-                onOpenProfile={onOpenProfile}
+                token={token}
+                onViewUser={onViewUser}
                 onChanged={loadOutfits}
               />
             ))}
@@ -379,6 +384,7 @@ export default function CommunityPage({ user, token, onOpenProfile }) {
       {uploadOpen && (
         <CaptureModal
           date={new Date()}
+          token={token}
           onClose={() => setUploadOpen(false)}
           onSaved={loadOutfits}
         />

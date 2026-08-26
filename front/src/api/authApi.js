@@ -33,6 +33,11 @@ export async function fetchMe(token) {
   return handle(res, '로그인이 필요합니다');
 }
 
+export async function fetchPublicUser(userId) {
+  const res = await fetch(`${BASE_URL}/api/auth/users/${userId}`);
+  return handle(res, '사용자를 찾을 수 없습니다');
+}
+
 export async function updateProfile(token, { displayName, bio, avatarFile }) {
   const formData = new FormData();
   if (displayName !== undefined) formData.append('displayName', displayName);
