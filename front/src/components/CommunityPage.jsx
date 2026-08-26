@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchOutfits, photoUrl, setOutfitLiked, setOutfitSaved, fetchComments, addComment } from '../api/outfitApi';
 import { fetchRoomCounts } from '../api/roomApi';
 import { LOOK_CATEGORIES } from '../constants/lookCategories';
@@ -344,7 +345,7 @@ export default function CommunityPage({ user, token, onOpenProfile }) {
         <span className="material-symbol">add</span>
       </button>
 
-      {pickerOpen && (
+      {pickerOpen && createPortal(
         <div className="modal-backdrop" onClick={() => setPickerOpen(false)}>
           <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -371,7 +372,8 @@ export default function CommunityPage({ user, token, onOpenProfile }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {uploadOpen && (

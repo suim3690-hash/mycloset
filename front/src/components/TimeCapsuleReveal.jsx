@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchDueTimeCapsules, markTimeCapsuleOpened } from '../api/timeCapsuleApi';
 import { fetchOutfitByDate, photoUrl } from '../api/outfitApi';
 import { toDateKey } from '../utils/date';
@@ -33,7 +34,7 @@ export default function TimeCapsuleReveal() {
     setQueue((prev) => prev.slice(1));
   }
 
-  return (
+  return createPortal(
     <div className="modal-backdrop">
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -72,6 +73,7 @@ export default function TimeCapsuleReveal() {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

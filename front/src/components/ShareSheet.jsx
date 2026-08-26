@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { photoUrl } from '../api/outfitApi';
 
 const SHARE_URL = typeof window !== 'undefined' ? window.location.origin : '';
@@ -56,7 +57,7 @@ export default function ShareSheet({ onClose, outfit }) {
     }
   }
 
-  return (
+  return createPortal(
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -77,6 +78,7 @@ export default function ShareSheet({ onClose, outfit }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

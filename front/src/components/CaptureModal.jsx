@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FILTERS } from '../constants/filters';
 import { registerOutfit, fetchOutfitsByDateAll, setMainOutfit, updateOutfitDetails, photoUrl } from '../api/outfitApi';
 import { reverseGeocode, getCurrentLocation } from '../api/geoApi';
@@ -303,7 +304,7 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
   const hasExisting = (existingOutfits?.length ?? 0) > 0;
   const titles = { add: '사진 추가', edit: '기록 수정' };
 
-  return (
+  return createPortal(
     <>
       <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
@@ -522,6 +523,7 @@ export default function CaptureModal({ date, onClose, onSaved, initialMode }) {
       </div>
 
       {shareOpen && <ShareSheet outfit={mainOutfit} onClose={() => setShareOpen(false)} />}
-    </>
+    </>,
+    document.body,
   );
 }

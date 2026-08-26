@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchRoom, fetchRoomMessages, joinRoom, leaveRoom, sendRoomMessage } from '../api/roomApi';
 
 const POLL_INTERVAL_MS = 4000;
@@ -96,7 +97,7 @@ export default function LookRoomModal({ lookCategory, user, token, onClose, onMe
     }
   }
 
-  return (
+  return createPortal(
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet room-modal-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -160,6 +161,7 @@ export default function LookRoomModal({ lookCategory, user, token, onClose, onMe
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

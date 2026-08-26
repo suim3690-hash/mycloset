@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchMagazine } from '../api/magazineApi';
 import { CATEGORY_COLORS } from '../constants/magazineCategories';
 import { LOOK_CATEGORIES } from '../constants/lookCategories';
@@ -187,7 +188,7 @@ export default function MagazinePage() {
         )}
       </div>
 
-      {pickerOpen && (
+      {pickerOpen && createPortal(
         <div className="modal-backdrop" onClick={() => setPickerOpen(false)}>
           <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -214,7 +215,8 @@ export default function MagazinePage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {captureOpen && (
