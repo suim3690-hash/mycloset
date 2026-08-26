@@ -91,6 +91,15 @@ export async function setOutfitSaved(id, saved) {
   return res.json();
 }
 
+export async function setOutfitShared(token, id, shared) {
+  const res = await fetch(`${BASE_URL}/api/outfits/${id}/share?shared=${shared}`, {
+    method: 'POST',
+    headers: authHeaders(token),
+  });
+  if (!res.ok) throw new Error('공유 처리에 실패했습니다');
+  return res.json();
+}
+
 export async function fetchSavedOutfits() {
   const res = await fetch(`${BASE_URL}/api/outfits/saved`);
   if (!res.ok) throw new Error('저장한 목록 조회에 실패했습니다');

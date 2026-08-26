@@ -117,6 +117,14 @@ public class OutfitService {
                 .orElseThrow(() -> new IllegalArgumentException("기록을 찾을 수 없습니다: " + id));
     }
 
+    public Outfit setShared(String authorization, Long id, boolean shared) {
+        Long userId = authService.resolveUserId(authorization);
+        requireOwner(id, userId);
+        outfitMapper.setShared(id, shared ? 1 : 0);
+        return outfitMapper.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("기록을 찾을 수 없습니다: " + id));
+    }
+
     public List<Outfit> findSaved() {
         return outfitMapper.findSaved();
     }

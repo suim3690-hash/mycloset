@@ -103,6 +103,14 @@ public class OutfitController {
         return outfitService.setSaved(id, saved);
     }
 
+    @PostMapping("/{id}/share")
+    public Outfit setShared(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable Long id,
+            @RequestParam("shared") boolean shared) {
+        return outfitService.setShared(authorization, id, shared);
+    }
+
     @GetMapping("/{id}/comments")
     public List<OutfitComment> getComments(@PathVariable Long id) {
         return outfitService.getComments(id);

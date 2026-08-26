@@ -14,6 +14,7 @@ public class SchemaMigration implements ApplicationRunner {
 
     private static final String[] STATEMENTS = {
             "ALTER TABLE outfit_record ADD COLUMN IF NOT EXISTS user_id BIGINT",
+            "ALTER TABLE outfit_record ADD COLUMN IF NOT EXISTS is_shared SMALLINT DEFAULT 0 NOT NULL",
     };
 
     private final JdbcTemplate jdbcTemplate;

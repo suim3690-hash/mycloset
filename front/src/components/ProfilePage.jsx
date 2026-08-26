@@ -53,20 +53,17 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
     loadSavedOutfits();
   }, []);
 
-  const communityPosts = useMemo(
-    () => (outfits ?? []).filter((o) => o.memo && o.memo.trim()),
-    [outfits],
-  );
+  const myPosts = outfits ?? [];
 
   const stats = useMemo(() => {
     if (!outfits) return null;
-    const totalLikes = communityPosts.reduce((sum, o) => sum + (o.likeCount ?? 0), 0);
+    const totalLikes = myPosts.reduce((sum, o) => sum + (o.likeCount ?? 0), 0);
     return {
-      posts: communityPosts.length,
+      posts: myPosts.length,
       likes: totalLikes,
       saved: savedOutfits?.length ?? 0,
     };
-  }, [outfits, communityPosts, savedOutfits]);
+  }, [outfits, myPosts, savedOutfits]);
 
   const handle = useMemo(() => `@${(user.email || 'my_closet').split('@')[0]}`, [user.email]);
   const coverPhoto = outfits?.[0]?.photoPath;
@@ -263,9 +260,9 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
         </div>
 
         {gridTab === 'posts' &&
-          (communityPosts.length > 0 ? (
+          (myPosts.length > 0 ? (
             <div className="profile-grid">
-              {communityPosts.map((o) => (
+              {myPosts.map((o) => (
                 <button
                   key={o.id}
                   type="button"
@@ -278,7 +275,7 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
             </div>
           ) : (
             <p className="text-soft" style={{ padding: '24px 0', textAlign: 'center' }}>
-              아직 커뮤니티에 올린 게시물이 없어요
+              아직 캘린더에 남긴 기록이 없어요
             </p>
           ))}
 

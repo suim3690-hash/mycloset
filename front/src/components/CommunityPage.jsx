@@ -5,6 +5,7 @@ import { fetchRoomCounts } from '../api/roomApi';
 import { LOOK_CATEGORIES } from '../constants/lookCategories';
 import CaptureModal from './CaptureModal';
 import LookRoomModal from './LookRoomModal';
+import SharePicker from './SharePicker';
 
 const QUICK_CATEGORIES = ['미니멀룩', '클래식룩', '스트릿룩'];
 
@@ -164,7 +165,7 @@ export function CommunityCard({ outfit, user, token, onViewUser, onChanged }) {
         </span>
       </div>
 
-      <p className="community-caption">{renderCaption(outfit.memo)}</p>
+      {outfit.memo && <p className="community-caption">{renderCaption(outfit.memo)}</p>}
 
       {commentsOpen && (
         <div className="community-comments">
@@ -224,7 +225,7 @@ export default function CommunityPage({ user, token, onOpenProfile, onViewUser }
 
   function loadOutfits() {
     fetchOutfits()
-      .then((data) => setOutfits(data.filter((o) => o.memo && o.memo.trim())))
+      .then(setOutfits)
       .catch(() => setOutfits([]));
   }
 
@@ -261,7 +262,7 @@ export default function CommunityPage({ user, token, onOpenProfile, onViewUser }
       const postCategories = o.lookCategory ? o.lookCategory.split(',').filter(Boolean) : [];
       return (
         postCategories.some((cat) => selected.has(cat)) ||
-        Array.from(selected).some((cat) => o.memo.includes(`#${cat}`))
+        Array.from(selected).some((cat) => (o.memo ?? '').includes(`#${cat}`))
       );
     });
   }, [outfits, selected]);
@@ -324,7 +325,7 @@ export default function CommunityPage({ user, token, onOpenProfile, onViewUser }
           <div className="page-center">
             <p className="text-soft">
               {outfits.length === 0
-                ? '메모를 남긴 코디가 아직 없어요. 우측 하단 + 버튼으로 올려보세요 🌱'
+                ? '커뮤니티에 공유된 코디가 아직 없어요. 우측 하단 + 버튼으로 캘린더 기록을 공유해보세요 🌱'
                 : '이 룩엔 아직 게시물이 없어요'}
             </p>
           </div>
@@ -382,12 +383,7 @@ export default function CommunityPage({ user, token, onOpenProfile, onViewUser }
       )}
 
       {uploadOpen && (
-        <CaptureModal
-          date={new Date()}
-          token={token}
-          onClose={() => setUploadOpen(false)}
-          onSaved={loadOutfits}
-        />
+        <SharePicker token={token} onClose={() => setUploadOpen(false)} onShared={loadOutfits} />
       )}
 
       {activeRoom && (

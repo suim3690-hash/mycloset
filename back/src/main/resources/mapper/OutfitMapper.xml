@@ -4,7 +4,7 @@
 
     <sql id="columns">
         id, record_date, photo_path, filter_type, memo, is_main, item_tags,
-        look_category, location, like_count, is_liked, is_saved, created_at, user_id
+        look_category, location, like_count, is_liked, is_saved, created_at, user_id, is_shared
     </sql>
 
     <insert id="insert" parameterType="com.mycloset.outfit.Outfit">
@@ -19,11 +19,11 @@
 
     <select id="findAll" resultType="com.mycloset.outfit.Outfit">
         SELECT o.id, o.record_date, o.photo_path, o.filter_type, o.memo, o.is_main, o.item_tags,
-               o.look_category, o.location, o.like_count, o.is_liked, o.is_saved, o.created_at, o.user_id,
+               o.look_category, o.location, o.like_count, o.is_liked, o.is_saved, o.created_at, o.user_id, o.is_shared,
                u.display_name AS author_display_name, u.avatar_path AS author_avatar_path
         FROM outfit_record o
         LEFT JOIN app_user u ON u.id = o.user_id
-        WHERE o.is_main = 1
+        WHERE o.is_shared = 1
         ORDER BY o.record_date DESC, o.id DESC
     </select>
 
@@ -101,6 +101,10 @@
 
     <update id="setSaved">
         UPDATE outfit_record SET is_saved = #{saved} WHERE id = #{id}
+    </update>
+
+    <update id="setShared">
+        UPDATE outfit_record SET is_shared = #{shared} WHERE id = #{id}
     </update>
 
     <select id="findSaved" resultType="com.mycloset.outfit.Outfit">

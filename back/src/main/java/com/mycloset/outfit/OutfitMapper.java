@@ -35,6 +35,8 @@ public interface OutfitMapper {
 
     void setLiked(@Param("id") Long id, @Param("liked") int liked);
 
+    void setShared(@Param("id") Long id, @Param("shared") int shared);
+
     void setSaved(@Param("id") Long id, @Param("saved") int saved);
 
     List<Outfit> findSaved();
