@@ -2,6 +2,4 @@
 // Production build is served by nginx, which proxies /api/ and /uploads/
 // to the backend over HTTPS - use a relative (same-origin) URL there to
 // avoid mixed-content blocking.
-export const BASE_URL = import.meta.env.DEV
-  ? `http://${window.location.hostname}:8081`
-  : '';
+export const BASE_URL = ''
