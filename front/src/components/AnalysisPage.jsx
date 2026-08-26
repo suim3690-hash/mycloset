@@ -39,7 +39,7 @@ export default function AnalysisPage({ token }) {
   }
 
   if (view === 'detail' && selectedDate) {
-    return <AnalysisDetail dateKey={selectedDate} onBack={backToGallery} />;
+    return <AnalysisDetail dateKey={selectedDate} token={token} onBack={backToGallery} />;
   }
 
   return (

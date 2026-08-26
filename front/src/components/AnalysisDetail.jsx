@@ -31,7 +31,7 @@ function parseBreakdown(raw) {
   }
 }
 
-export default function AnalysisDetail({ dateKey, onBack }) {
+export default function AnalysisDetail({ dateKey, token, onBack }) {
   const [outfit, setOutfit] = useState(undefined);
   const [analysis, setAnalysis] = useState(null);
   const [moodTag, setMoodTag] = useState(null);
@@ -79,7 +79,7 @@ export default function AnalysisDetail({ dateKey, onBack }) {
     setCapsuleSaved(false);
 
     (async () => {
-      const found = await fetchOutfitByDate(dateKey);
+      const found = await fetchOutfitByDate(token, dateKey);
       if (cancelled) return;
       setOutfit(found);
 
@@ -94,7 +94,7 @@ export default function AnalysisDetail({ dateKey, onBack }) {
         setFactBomb(existing?.factBomb ?? null);
       }
 
-      const past = await fetchOutfitByDate(oneYearBefore(dateKey));
+      const past = await fetchOutfitByDate(token, oneYearBefore(dateKey));
       if (!cancelled) setPastOutfit(past);
     })();
 
@@ -116,7 +116,7 @@ export default function AnalysisDetail({ dateKey, onBack }) {
       const twin = findStyleTwin(dateKey, all);
       if (!twin) return;
       setStyleTwin(twin);
-      const outfit = await fetchOutfitByDate(twin.recordDate);
+      const outfit = await fetchOutfitByDate(token, twin.recordDate);
       if (!cancelled) setTwinOutfit(outfit);
     })();
 
