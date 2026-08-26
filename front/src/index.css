@@ -1,0 +1,78 @@
+:root {
+  --ink: #232c33;
+  --bg: #ccd6dc;
+  --card: rgba(255, 255, 255, 0.5);
+  --ice: #dee6ea;
+  --lime: #4d6579;
+  --lime-deep: #2e3f4d;
+  --lime-text: #2e3f4d;
+  --olive: #4c5a63;
+  --olive-soft: rgba(46, 63, 77, 0.55);
+  --violet: #c9c2e8;
+  --sky: #9dc3e6;
+  --peach: #f0c9b8;
+  --pink: #8b9db0;
+  --sun-red: #ba1a1a;
+  --sat-green: #4d6579;
+  --entry-gray: #e8e8e6;
+  --entry-pink: #95416c;
+
+  --glass-fill: rgba(255, 255, 255, 0.5);
+  --glass-fill-strong: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 8px 28px rgba(31, 38, 20, 0.14);
+  --neon: 255, 45, 149;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+@keyframes neonClickFlash {
+  0% {
+    box-shadow: 0 0 0 1px rgba(var(--neon), 0.8), 0 0 22px rgba(var(--neon), 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(var(--neon), 0), 0 0 0 rgba(var(--neon), 0);
+  }
+}
+
+button.neon-flash {
+  animation: neonClickFlash 0.55s ease-out;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.material-symbol {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

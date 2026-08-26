@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.outfit.OutfitMapper">
+
+    <sql id="columns">
+        id, record_date, photo_path, filter_type, memo, is_main, item_tags,
+        look_category, location, like_count, is_liked, is_saved, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.mycloset.outfit.Outfit">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('outfit_record_seq')
+        </selectKey>
+        INSERT INTO outfit_record
+            (id, record_date, photo_path, filter_type, memo, is_main, item_tags, look_category, location, created_at)
+        VALUES
+            (#{id}, #{recordDate}, #{photoPath}, #{filterType}, #{memo}, #{isMain}, #{itemTags}, #{lookCategory}, #{location}, now())
+    </insert>
+
+    <select id="findAll" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE is_main = 1
+        ORDER BY record_date DESC, id DESC
+    </select>
+
+    <select id="findByDate" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE record_date = #{recordDate}
+        ORDER BY is_main DESC, id DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <select id="findAllByDate" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE record_date = #{recordDate}
+        ORDER BY is_main DESC, id ASC
+    </select>
+
+    <update id="clearMainForDate">
+        UPDATE outfit_record SET is_main = 0 WHERE record_date = #{recordDate}
+    </update>
+
+    <update id="setMainById">
+        UPDATE outfit_record SET is_main = 1 WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateDetails" parameterType="com.mycloset.outfit.Outfit">
+        UPDATE outfit_record
+        SET memo = #{memo}, item_tags = #{itemTags}, look_category = #{lookCategory}, location = #{location}
+        WHERE id = #{id}
+    </update>
+
+    <update id="setLiked">
+        UPDATE outfit_record
+        SET like_count = like_count + CASE
+                WHEN #{liked} = 1 AND is_liked = 0 THEN 1
+                WHEN #{liked} = 0 AND is_liked = 1 THEN -1
+                ELSE 0
+            END,
+            is_liked = #{liked}
+        WHERE id = #{id}
+    </update>
+
+    <update id="setSaved">
+        UPDATE outfit_record SET is_saved = #{saved} WHERE id = #{id}
+    </update>
+
+    <select id="findSaved" resultType="com.mycloset.outfit.Outfit">
+        SELECT <include refid="columns" />
+        FROM outfit_record
+        WHERE is_saved = 1
+        ORDER BY record_date DESC, id DESC
+    </select>
+
+    <insert id="insertComment" parameterType="com.mycloset.outfit.OutfitComment">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('outfit_comment_seq')
+        </selectKey>
+        INSERT INTO outfit_comment (id, outfit_id, content, created_at)
+        VALUES (#{id}, #{outfitId}, #{content}, now())
+    </insert>
+
+    <select id="findCommentsByOutfitId" resultType="com.mycloset.outfit.OutfitComment">
+        SELECT id, outfit_id, content, created_at
+        FROM outfit_comment
+        WHERE outfit_id = #{outfitId}
+        ORDER BY created_at ASC
+    </select>
+
+</mapper>

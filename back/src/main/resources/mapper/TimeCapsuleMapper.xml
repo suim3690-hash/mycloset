@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.timecapsule.TimeCapsuleMapper">
+
+    <insert id="insert" parameterType="com.mycloset.timecapsule.TimeCapsule">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('time_capsule_seq')
+        </selectKey>
+        INSERT INTO time_capsule (id, record_date, message, reveal_date, opened, created_at)
+        VALUES (#{id}, #{recordDate}, #{message}, #{revealDate}, 0, now())
+    </insert>
+
+    <select id="findDue" resultType="com.mycloset.timecapsule.TimeCapsule">
+        SELECT id, record_date, message, reveal_date, opened, created_at
+        FROM time_capsule
+        WHERE opened = 0 AND reveal_date &lt;= CURRENT_DATE
+        ORDER BY reveal_date ASC
+    </select>
+
+    <update id="markOpened">
+        UPDATE time_capsule SET opened = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

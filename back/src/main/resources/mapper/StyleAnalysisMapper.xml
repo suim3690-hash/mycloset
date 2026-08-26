@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.analysis.StyleAnalysisMapper">
+
+    <insert id="insert" parameterType="com.mycloset.analysis.StyleAnalysis">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('style_analysis_seq')
+        </selectKey>
+        INSERT INTO style_analysis (id, record_date, style_breakdown, selected_tags, created_at)
+        VALUES (#{id}, #{recordDate}, #{styleBreakdown}, #{selectedTags}, now())
+    </insert>
+
+    <select id="findAll" resultType="com.mycloset.analysis.StyleAnalysis">
+        SELECT id, record_date, style_breakdown, selected_tags, reason_tags, fact_bomb, created_at
+        FROM style_analysis
+        ORDER BY record_date DESC
+    </select>
+
+    <select id="findByDate" resultType="com.mycloset.analysis.StyleAnalysis">
+        SELECT id, record_date, style_breakdown, selected_tags, reason_tags, fact_bomb, created_at
+        FROM style_analysis
+        WHERE record_date = #{recordDate}
+    </select>
+
+    <update id="updateTags" parameterType="com.mycloset.analysis.StyleAnalysis">
+        UPDATE style_analysis
+        SET selected_tags = #{selectedTags}, reason_tags = #{reasonTags}
+        WHERE record_date = #{recordDate}
+    </update>
+
+    <update id="updateBreakdown" parameterType="com.mycloset.analysis.StyleAnalysis">
+        UPDATE style_analysis
+        SET style_breakdown = #{styleBreakdown}
+        WHERE record_date = #{recordDate}
+    </update>
+
+    <update id="updateFactBomb" parameterType="com.mycloset.analysis.StyleAnalysis">
+        UPDATE style_analysis
+        SET fact_bomb = #{factBomb}
+        WHERE record_date = #{recordDate}
+    </update>
+
+    <insert id="insertFactBomb" parameterType="com.mycloset.analysis.StyleAnalysis">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('style_analysis_seq')
+        </selectKey>
+        INSERT INTO style_analysis (id, record_date, fact_bomb, created_at)
+        VALUES (#{id}, #{recordDate}, #{factBomb}, now())
+    </insert>
+
+</mapper>

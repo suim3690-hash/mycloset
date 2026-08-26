@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.auth.AuthMapper">
+
+    <insert id="insertUser" parameterType="com.mycloset.auth.AppUser">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('app_user_seq')
+        </selectKey>
+        INSERT INTO app_user (id, email, password_hash, display_name, bio, avatar_path, created_at)
+        VALUES (#{id}, #{email}, #{passwordHash}, #{displayName}, #{bio}, #{avatarPath}, now())
+    </insert>
+
+    <select id="findUserByEmail" resultType="com.mycloset.auth.AppUser">
+        SELECT id, email, password_hash, display_name, bio, avatar_path, created_at
+        FROM app_user
+        WHERE email = #{email}
+    </select>
+
+    <select id="findUserById" resultType="com.mycloset.auth.AppUser">
+        SELECT id, email, password_hash, display_name, bio, avatar_path, created_at
+        FROM app_user
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateProfile" parameterType="com.mycloset.auth.AppUser">
+        UPDATE app_user
+        SET display_name = #{displayName}, bio = #{bio}, avatar_path = #{avatarPath}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertSession" parameterType="com.mycloset.auth.SessionRow">
+        INSERT INTO user_session (token, user_id, created_at)
+        VALUES (#{token}, #{userId}, now())
+    </insert>
+
+    <select id="findUserIdByToken" resultType="long">
+        SELECT user_id FROM user_session WHERE token = #{token}
+    </select>
+
+    <delete id="deleteSession">
+        DELETE FROM user_session WHERE token = #{token}
+    </delete>
+
+</mapper>

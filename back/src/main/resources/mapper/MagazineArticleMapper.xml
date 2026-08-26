@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.magazine.MagazineArticleMapper">
+
+    <select id="findAll" resultType="com.mycloset.magazine.MagazineArticle">
+        SELECT id, category, title, source_name, source_url, image_url, summary_ko, created_at
+        FROM magazine_article
+        ORDER BY id DESC
+    </select>
+
+    <select id="findByCategories" resultType="com.mycloset.magazine.MagazineArticle">
+        SELECT id, category, title, source_name, source_url, image_url, summary_ko, created_at
+        FROM magazine_article
+        WHERE category IN
+        <foreach item="category" collection="list" open="(" separator="," close=")">
+            #{category}
+        </foreach>
+        ORDER BY id DESC
+    </select>
+
+    <update id="updateSummary" parameterType="com.mycloset.magazine.MagazineArticle">
+        UPDATE magazine_article
+        SET summary_ko = #{summaryKo}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

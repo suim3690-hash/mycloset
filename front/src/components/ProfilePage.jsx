@@ -1,0 +1,281 @@
+import { useEffect, useMemo, useState } from 'react';
+import { fetchOutfits, fetchSavedOutfits, photoUrl } from '../api/outfitApi';
+import { fetchAllAnalysis } from '../api/analysisApi';
+import { updateProfile, logout } from '../api/authApi';
+import PreviewModal from './PreviewModal';
+
+function parseBreakdown(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed.categories ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default function ProfilePage({ user, token, onProfileUpdated, onLogout }) {
+  const [outfits, setOutfits] = useState(undefined);
+  const [analyses, setAnalyses] = useState(undefined);
+  const [savedOutfits, setSavedOutfits] = useState(undefined);
+
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(user.displayName);
+  const [draftBio, setDraftBio] = useState(user.bio || '');
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [gridTab, setGridTab] = useState('posts');
+
+  useEffect(() => {
+    fetchOutfits().then(setOutfits).catch(() => setOutfits([]));
+    fetchAllAnalysis().then(setAnalyses).catch(() => setAnalyses([]));
+    fetchSavedOutfits().then(setSavedOutfits).catch(() => setSavedOutfits([]));
+  }, []);
+
+  const communityPosts = useMemo(
+    () => (outfits ?? []).filter((o) => o.memo && o.memo.trim()),
+    [outfits],
+  );
+
+  const stats = useMemo(() => {
+    if (!outfits) return null;
+    const totalLikes = communityPosts.reduce((sum, o) => sum + (o.likeCount ?? 0), 0);
+    return {
+      posts: communityPosts.length,
+      likes: totalLikes,
+      saved: savedOutfits?.length ?? 0,
+    };
+  }, [outfits, communityPosts, savedOutfits]);
+
+  const handle = useMemo(() => `@${(user.email || 'my_closet').split('@')[0]}`, [user.email]);
+  const coverPhoto = outfits?.[0]?.photoPath;
+
+  const topLooks = useMemo(() => {
+    if (!analyses) return [];
+    const totals = new Map();
+    for (const a of analyses) {
+      for (const c of parseBreakdown(a.styleBreakdown)) {
+        totals.set(c.name, (totals.get(c.name) || 0) + c.percent);
+      }
+    }
+    return Array.from(totals.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name]) => name);
+  }, [analyses]);
+
+  function startEditing() {
+    setDraftName(user.displayName);
+    setDraftBio(user.bio || '');
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setError(null);
+    setEditing(true);
+  }
+
+  function handleAvatarChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  async function saveProfile() {
+    setIsSaving(true);
+    setError(null);
+    try {
+      const updated = await updateProfile(token, {
+        displayName: draftName.trim() || user.displayName,
+        bio: draftBio.trim(),
+        avatarFile,
+      });
+      onProfileUpdated(updated);
+      setEditing(false);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleLogoutClick() {
+    await logout(token);
+    onLogout();
+  }
+
+  return (
+    <div>
+      <div className="top-bar">
+        <span style={{ width: 36 }} />
+        <span className="top-bar-title">나의 옷장</span>
+        <button className="icon-btn" onClick={handleLogoutClick}>
+          <span className="material-symbol">logout</span>
+        </button>
+      </div>
+
+      <div className="page">
+        <div
+          className={`profile-cover ${coverPhoto ? '' : 'profile-cover-fallback'}`}
+          style={coverPhoto ? { backgroundImage: `url(${photoUrl(coverPhoto)})` } : undefined}
+        >
+          <label className="profile-avatar" style={{ cursor: editing ? 'pointer' : 'default' }}>
+            {avatarPreview || user.avatarPath ? (
+              <img
+                src={avatarPreview || photoUrl(user.avatarPath)}
+                alt="프로필 사진"
+                className="profile-avatar-img"
+              />
+            ) : (
+              <span className="material-symbol">checkroom</span>
+            )}
+            {editing && (
+              <>
+                <span className="profile-avatar-edit-badge">
+                  <span className="material-symbol">photo_camera</span>
+                </span>
+                <input type="file" accept="image/*" onChange={handleAvatarChange} hidden />
+              </>
+            )}
+          </label>
+        </div>
+
+        <div className="profile-identity">
+          {!editing ? (
+            <>
+              <span className="profile-name">{user.displayName}</span>
+              <span className="profile-handle">{handle}</span>
+              {user.bio && <span className="profile-bio">{user.bio}</span>}
+            </>
+          ) : (
+            <div className="profile-edit-form">
+              <input
+                className="memo-input"
+                style={{ textAlign: 'center' }}
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                placeholder="닉네임"
+                maxLength={20}
+              />
+              <input
+                className="memo-input"
+                style={{ textAlign: 'center' }}
+                value={draftBio}
+                onChange={(e) => setDraftBio(e.target.value)}
+                placeholder="한 줄 소개"
+                maxLength={40}
+              />
+              {error && <p className="error-text">{error}</p>}
+            </div>
+          )}
+        </div>
+
+        <div className="profile-stats-row">
+          <div className="profile-stat-tile">
+            <span className="profile-stat-number">{stats?.posts ?? '-'}</span>
+            <span className="profile-stat-label">게시물</span>
+          </div>
+          <div className="profile-stat-tile">
+            <span className="profile-stat-number">{stats?.likes ?? '-'}</span>
+            <span className="profile-stat-label">좋아요</span>
+          </div>
+          <div className="profile-stat-tile">
+            <span className="profile-stat-number">{stats?.saved ?? '-'}</span>
+            <span className="profile-stat-label">저장</span>
+          </div>
+        </div>
+
+        <div className="profile-actions-row">
+          {!editing ? (
+            <>
+              <button className="report-btn-primary" onClick={startEditing}>
+                프로필 편집
+              </button>
+              <button className="report-btn-secondary" onClick={() => setPreviewOpen(true)}>
+                <span className="material-symbol">shopping_bag</span>
+                구매 전 미리보기
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="report-btn-primary" onClick={saveProfile} disabled={isSaving}>
+                {isSaving ? '저장 중...' : '저장하기'}
+              </button>
+              <button className="report-btn-secondary" onClick={() => setEditing(false)} disabled={isSaving}>
+                취소
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="blob-card" style={{ marginTop: 20 }}>
+          <span className="blob-card-heading">
+            <span className="material-symbol">auto_awesome</span>
+            내가 가장 많이 입은 룩
+          </span>
+          {topLooks.length > 0 ? (
+            <div className="report-chip-row">
+              {topLooks.map((look, i) => (
+                <span key={look} className={`item-tag-chip ${i === 0 ? '' : 'muted'}`}>
+                  {i === 0 && <span className="material-symbol">stars</span>}
+                  {look}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-soft">아직 AI 분석 데이터가 부족해요. 분석 탭에서 코디를 분석해보세요!</p>
+          )}
+        </div>
+
+        <div className="profile-tabs">
+          <button
+            className={`profile-tab-btn ${gridTab === 'posts' ? 'active' : ''}`}
+            onClick={() => setGridTab('posts')}
+          >
+            게시물
+          </button>
+          <button
+            className={`profile-tab-btn ${gridTab === 'saved' ? 'active' : ''}`}
+            onClick={() => setGridTab('saved')}
+          >
+            저장
+          </button>
+        </div>
+
+        {gridTab === 'posts' &&
+          (communityPosts.length > 0 ? (
+            <div className="profile-grid">
+              {communityPosts.map((o) => (
+                <div key={o.id} className="profile-grid-item">
+                  <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-soft" style={{ padding: '24px 0', textAlign: 'center' }}>
+              아직 커뮤니티에 올린 게시물이 없어요
+            </p>
+          ))}
+
+        {gridTab === 'saved' &&
+          (savedOutfits && savedOutfits.length > 0 ? (
+            <div className="profile-grid">
+              {savedOutfits.map((o) => (
+                <div key={o.id} className="profile-grid-item">
+                  <img src={photoUrl(o.photoPath)} alt={o.recordDate} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-soft" style={{ padding: '24px 0', textAlign: 'center' }}>
+              저장한 게시물이 없어요
+            </p>
+          ))}
+      </div>
+
+      {previewOpen && <PreviewModal onClose={() => setPreviewOpen(false)} />}
+    </div>
+  );
+}

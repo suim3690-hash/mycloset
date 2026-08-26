@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.stylist.StyleProfileMapper">
+
+    <select id="findByUserId" resultType="com.mycloset.stylist.StyleProfile">
+        SELECT id, user_id, gender, height_cm, weight_kg, preferred_looks, recommendation, updated_at
+        FROM style_profile
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.mycloset.stylist.StyleProfile">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('style_profile_seq')
+        </selectKey>
+        INSERT INTO style_profile (id, user_id, gender, height_cm, weight_kg, preferred_looks, recommendation, updated_at)
+        VALUES (#{id}, #{userId}, #{gender}, #{heightCm}, #{weightKg}, #{preferredLooks}, #{recommendation}, now())
+    </insert>
+
+    <update id="update" parameterType="com.mycloset.stylist.StyleProfile">
+        UPDATE style_profile
+        SET gender = #{gender}, height_cm = #{heightCm}, weight_kg = #{weightKg},
+            preferred_looks = #{preferredLooks}, recommendation = #{recommendation}, updated_at = now()
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

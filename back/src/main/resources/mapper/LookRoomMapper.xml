@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.room.LookRoomMapper">
+
+    <insert id="insertMemberIfAbsent">
+        INSERT INTO look_room_member (id, look_category, user_id, joined_at)
+        VALUES (nextval('look_room_member_seq'), #{lookCategory}, #{userId}, now())
+        ON CONFLICT (look_category, user_id) DO NOTHING
+    </insert>
+
+    <delete id="deleteMember">
+        DELETE FROM look_room_member
+        WHERE look_category = #{lookCategory} AND user_id = #{userId}
+    </delete>
+
+    <select id="isMember" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM look_room_member
+            WHERE look_category = #{lookCategory} AND user_id = #{userId}
+        )
+    </select>
+
+    <select id="countMembers" resultType="int">
+        SELECT COUNT(*) FROM look_room_member WHERE look_category = #{lookCategory}
+    </select>
+
+    <select id="countAllMembers" resultType="com.mycloset.room.RoomCount">
+        SELECT look_category AS lookCategory, COUNT(*) AS memberCount
+        FROM look_room_member
+        GROUP BY look_category
+    </select>
+
+    <insert id="insertMessage" parameterType="com.mycloset.room.LookRoomMessage">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('look_room_message_seq')
+        </selectKey>
+        INSERT INTO look_room_message (id, look_category, user_id, content, created_at)
+        VALUES (#{id}, #{lookCategory}, #{userId}, #{content}, now())
+    </insert>
+
+    <select id="findMessages" resultType="com.mycloset.room.LookRoomMessage">
+        SELECT m.id, m.look_category, m.user_id, m.content, m.created_at,
+               u.display_name AS sender_name, u.avatar_path AS sender_avatar_path
+        FROM look_room_message m
+        JOIN app_user u ON u.id = m.user_id
+        WHERE m.look_category = #{lookCategory}
+        ORDER BY m.created_at ASC
+    </select>
+
+</mapper>
