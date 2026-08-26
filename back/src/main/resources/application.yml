@@ -1,23 +1,32 @@
 spring:
   application:
     name: back
+
   profiles:
-    active: local
+    active: ${SPRING_PROFILES_ACTIVE:prod}
+
   web:
     error:
       include-message: always
+
   datasource:
     url: ${DB_URL:}
     username: ${DB_USERNAME:}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:3}
+      minimum-idle: ${DB_POOL_MIN_IDLE:0}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:20000}
+
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -26,10 +35,8 @@ mybatis:
     jdbc-type-for-null: VARCHAR
 
 app:
-  upload-dir: uploads
-  
+  upload-dir: ${UPLOAD_DIR:/app/uploads}
 
 openai:
   api-key: ${OPENAI_API_KEY:}
-  model: gpt-4o
- 
+  model: ${OPENAI_MODEL:gpt-4o}
