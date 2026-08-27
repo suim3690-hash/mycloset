@@ -1,16 +1,149 @@
-# React + Vite
+나의 옷장 (My Closet)
+AI가 함께 정리해주는 나만의 패션 스타일 다이어리
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+캘린더에 매일의 코디 사진을 기록하면 AI가 스타일을 분석하고, 옷 아이템을 자동으로 옷장에 정리해주고, 다른 사람들과 공유도 할 수 있는 웹 서비스입니다.
 
-Currently, two official plugins are available:
+서비스 소개
+나의 옷장은 "오늘 뭐 입었지?"를 매번 기억하기 힘든 사람들을 위한 서비스입니다. 사진 한 장만 올리면 AI가 스타일 분석, 옷장 자동 분류, 코디 추천, 스타일 상담까지 대신 해주기 때문에 기록하는 습관만 들이면 나머지는 AI가 채워줍니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+핵심 기능
+캘린더 — 매일의 코디 기록
+날짜를 선택해 사진, 메모, 아이템 태그, 룩 카테고리(30여 종), 위치를 함께 기록
+하루에 여러 장 업로드 가능하며 대표 사진(메인) 지정 가능
+월간 캘린더 뷰 / 리스트 뷰 전환
+기록 수정·삭제 지원
+기본은 비공개이며, 원할 때만 골라서 커뮤니티에 공유
+AI 스타일 분석
+사진을 분석해 "스트릿룩 50% + 미니멀룩 50%"처럼 스타일 비중과 근거를 제공
+팩트폭력: 봐주지 않고 냉정하게(또는 정말 잘 입었으면 칭찬으로) 코디를 평가하는 재미 기능
+팩폭 상담사 채팅: 평가 결과에 반박·질문하면 계속 답해주는 대화형 상담 (기록당 3턴 제한)
+감정×스타일 리포트: 요일·계절·날씨별로 기분과 스타일의 상관관계를 시각화
+스타일 트윈: 과거 기록 중 오늘과 가장 비슷한 스타일이었던 날을 자동으로 찾아줌
+1년 전 오늘 뭘 입었는지도 함께 표시
+나만의 스타일리스트
+성별·키·몸무게와 좋아하는 스타일(복수 선택)을 입력
+AI가 체형에 맞는 스타일 1~2개와 상의/하의/신발/액세서리별 구체적인 아이템·추천 근거·스타일링 팁을 제공
+입력값은 저장되며 언제든 다시 입력해 재추천 가능
+나의 옷장 — AI가 자동으로 정리하는 옷장
+캘린더에 사진을 올릴 때마다 AI가 사진 속 아이템을 상의 / 아우터 / 바지 / 원피스 / 스커트 / 가방 / 모자 / 소품 8개 카테고리로 자동 분류
+사용자는 그냥 기록만 남기면 카테고리별로 자동 정리된 옷장을 확인 가능
+코디 매칭받기: AI가 옷장 속 상의·하의를 실제로 조합해 어울리는 이유와 완성되는 룩을 아이템 사진과 함께 제시
+클롱과 대화하기: '클롱'이라는 AI 스타일리스트 챗봇과 자유 대화. "다른 옷 추천받기" 버튼을 누르면 내 옷장을 참고해 실제 브랜드명·아이템·추천 이유를 색상 스와치와 함께 3개씩 제시
+커뮤니티
+캘린더 기록 중 원하는 것만 골라 공유 (비공개 기록은 자동 노출되지 않음)
+좋아요, 댓글(시간 표시), 저장(북마크)
+룩 카테고리별 채팅방(예: 스트릿룩 방)에서 실시간 채팅, 참가 인원 수 표시
+다른 사용자 프로필 방문 및 게시물 열람
+본인 게시물 수정·삭제
+매거진
+패션 트렌드/뉴스 기사를 매일 자동 최신화
+룩 카테고리별 필터링, 기사 북마크
+구매 전 미리보기
+사고 싶은 옷 사진을 올리면 기존 코디와 비교해 어울릴지 AI가 미리 판단
+스타일 타임캡슐
+오늘의 코디에 메시지를 남기고 3개월/6개월/1년 뒤 다시 열어보는 기능
+열람 가능한 날짜가 되면 화면에 표시
+프로필
+닉네임, 소개, 프로필 사진, 커버 사진을 탭 한 번으로 즉시 변경
+게시물 수, 받은 좋아요, 저장한 게시물 통계
+가장 많이 입은 룩 TOP 3
+내 게시물 / 저장한 게시물을 탭으로 구분한 그리드 뷰
+계정
+이메일 회원가입/로그인, 다중 사용자 지원
+각 사용자의 캘린더 기록은 기본적으로 비공개
+서비스 사용 방법
+Step 1. 회원가입 / 로그인
+이메일과 비밀번호로 가입 후 로그인합니다.
 
-## React Compiler
+Step 2. 오늘의 코디 기록
+캘린더에서 날짜를 선택하고 사진과 메모, 룩 카테고리, 아이템 태그를 입력해 저장합니다. 저장과 동시에 AI가 아이템을 자동 분류해 나의 옷장에 반영합니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Step 3. AI 스타일 분석 확인
+분석 탭에서 방금 올린 코디의 스타일 비중을 확인하고, 원하면 팩트폭력·감정×스타일 리포트·스타일 트윈까지 함께 살펴봅니다.
 
-## Expanding the Oxlint configuration
+Step 4. 나의 옷장 둘러보기
+캘린더 화면 하단의 "나의 옷장 들어가기"로 들어가 카테고리별로 정리된 아이템을 확인합니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+
+상의 / 아우터 / 바지 / 원피스 / 스커트 / 가방 / 모자 / 소품
+"코디 매칭받기"로 상·하의 조합 추천을, "클롱과 대화하기"로 스타일 상담과 다른 브랜드 추천을 받을 수 있습니다.
+
+Step 5. 커뮤니티에 공유 (선택)
+공유하고 싶은 기록만 골라 커뮤니티에 올리고, 룩 카테고리 채팅방에도 참가해봅니다.
+
+Step 6. 프로필 꾸미기
+프로필 사진과 커버 사진을 설정하고 내 스타일 통계를 확인합니다.
+
+기술 스택
+구분	기술
+Frontend	React 19, Vite
+Backend	Java 21, Spring Boot, MyBatis
+Database	PostgreSQL (Supabase)
+AI	OpenAI GPT-4o (Vision + Chat 전 기능 공통)
+외부 API	OpenStreetMap Nominatim (위치 검색)
+배포	Docker, nginx
+AI Coding Agent	Claude Code
+로컬 실행 방법
+사전 준비
+Node.js 및 npm
+Java 21
+Supabase 프로젝트 (PostgreSQL)
+OpenAI API Key
+Supabase SQL Editor에서 database/schema.sql을 먼저 실행해 기본 테이블을 준비합니다. 이후 추가된 테이블/컬럼은 백엔드가 기동될 때 SchemaMigration이 자동으로 생성·반영하므로 별도 마이그레이션 작업이 필요 없습니다.
+
+Frontend
+
+cd front
+npm install
+npm run dev
+기본 개발 주소는 http://localhost:5173이며, Vite 개발 서버가 /api, /uploads 요청을 http://localhost:8081로 자동 프록시합니다(vite.config.js).
+
+Backend
+back/src/main/resources/application-local.yml 파일을 만들어(Git에 커밋되지 않는 개인 설정 파일) 아래 내용을 채웁니다.
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://<supabase-host>:5432/postgres
+    username: <supabase-user>
+    password: <supabase-password>
+
+openai:
+  api-key: <openai-api-key>
+이후 local 프로필로 실행합니다.
+
+
+cd back
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+Backend: http://localhost:8081
+로컬 Windows 환경에서 업로드 사진 저장 경로(UPLOAD_DIR)의 기본값은 컨테이너 기준 /app/uploads이므로, 로컬에서는 application-local.yml에 app.upload-dir: uploads처럼 상대 경로를 함께 지정하는 것을 권장합니다.
+환경변수
+배포(prod) 환경에서는 아래 환경변수로 설정을 주입합니다. application-local.yml과 마찬가지로 Git에 커밋하지 않습니다.
+
+
+DB_URL=jdbc:postgresql://<host>:5432/postgres
+DB_USERNAME=<supabase-user>
+DB_PASSWORD=<supabase-password>
+OPENAI_API_KEY=<openai-api-key>
+OPENAI_MODEL=gpt-4o
+SERVER_PORT=8081
+UPLOAD_DIR=/app/uploads
+주요 제한사항
+AI 관련 기능(스타일 분석, 팩트폭력, 스타일리스트, 옷장 자동 분류, 코디 매칭, 클롱 챗봇)은 OpenAI API Key가 없으면 전부 동작하지 않습니다.
+옷장 자동 분류는 새로 업로드하는 사진부터 적용되며, 기존 기록은 별도 백필이 필요합니다.
+사진 업로드 최대 용량은 20MB입니다.
+클롱의 브랜드 추천은 실제 재고/가격 정보가 아닌 AI의 스타일 추천이며, 실물 이미지 대신 대표 색상 스와치로 표시됩니다.
+좋아요/저장은 현재 게시물 단위로 집계되며, 사용자별 개별 이력으로 분리 저장되지는 않습니다.
+한 번에 하나의 사진만 업로드할 수 있습니다(다건 동시 업로드 미지원).
+검증
+Frontend 프로덕션 빌드:
+
+
+cd front
+npm run build
+Backend 컴파일/실행 확인:
+
+
+cd back
+./gradlew compileJava
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
