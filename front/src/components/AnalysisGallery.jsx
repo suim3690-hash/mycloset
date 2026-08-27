@@ -21,12 +21,7 @@ export default function AnalysisGallery({ outfits, token, onSelect, onOpenInsigh
   }
 
   const recentOutfits = useMemo(() => {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-    const cutoff = oneMonthAgo.toISOString().slice(0, 10);
-
     return outfits
-      .filter((o) => o.recordDate >= cutoff)
       .slice()
       .sort((a, b) => (a.recordDate < b.recordDate ? 1 : -1));
   }, [outfits]);
@@ -46,9 +41,9 @@ export default function AnalysisGallery({ outfits, token, onSelect, onOpenInsigh
       <div className="page">
         <div className="analysis-gallery-heading-block">
           <h2 className="analysis-gallery-heading">
-            <span className="heading-highlight">최근 한 달</span>
+            <span className="heading-highlight">나의 기록</span>
           </h2>
-          <p className="analysis-gallery-subtitle">최근 30일 동안의 스타일 기록이에요</p>
+          <p className="analysis-gallery-subtitle">지금까지 캘린더에 남긴 스타일 기록이에요</p>
         </div>
 
         <button className="blob-card stylist-trigger" onClick={onOpenStylist}>
@@ -64,7 +59,7 @@ export default function AnalysisGallery({ outfits, token, onSelect, onOpenInsigh
 
         {recentOutfits.length === 0 && (
           <div className="page-center">
-            <p className="text-soft">최근 한 달간 기록이 없어요. 캘린더에서 먼저 기록을 남겨주세요 🌱</p>
+            <p className="text-soft">아직 기록이 없어요. 캘린더에서 먼저 기록을 남겨주세요 🌱</p>
           </div>
         )}
 

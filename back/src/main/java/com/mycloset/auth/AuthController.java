@@ -47,8 +47,9 @@ public class AuthController {
             @RequestHeader("Authorization") String authorization,
             @RequestParam(value = "displayName", required = false) String displayName,
             @RequestParam(value = "bio", required = false) String bio,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar) {
-        return authService.updateProfile(extractToken(authorization), displayName, bio, avatar);
+            @RequestParam(value = "avatar", required = false) MultipartFile avatar,
+            @RequestParam(value = "cover", required = false) MultipartFile cover) {
+        return authService.updateProfile(extractToken(authorization), displayName, bio, avatar, cover);
     }
 
     @PostMapping("/logout")

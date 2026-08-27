@@ -38,11 +38,12 @@ export async function fetchPublicUser(userId) {
   return handle(res, '사용자를 찾을 수 없습니다');
 }
 
-export async function updateProfile(token, { displayName, bio, avatarFile }) {
+export async function updateProfile(token, { displayName, bio, avatarFile, coverFile }) {
   const formData = new FormData();
   if (displayName !== undefined) formData.append('displayName', displayName);
   if (bio !== undefined) formData.append('bio', bio);
   if (avatarFile) formData.append('avatar', avatarFile);
+  if (coverFile) formData.append('cover', coverFile);
 
   const res = await fetch(`${BASE_URL}/api/auth/profile`, {
     method: 'POST',

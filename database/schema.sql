@@ -78,6 +78,7 @@ CREATE TABLE app_user (
     display_name  VARCHAR(50) NOT NULL,
     bio           VARCHAR(100),
     avatar_path   VARCHAR(255),
+    cover_path    VARCHAR(255),
     created_at    TIMESTAMP DEFAULT now() NOT NULL
 );
 

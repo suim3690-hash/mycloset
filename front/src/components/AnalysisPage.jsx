@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchOutfits } from '../api/outfitApi';
+import { fetchMyOutfits } from '../api/outfitApi';
 import AnalysisGallery from './AnalysisGallery';
 import AnalysisDetail from './AnalysisDetail';
 import AnalysisInsight from './AnalysisInsight';
@@ -11,14 +11,14 @@ export default function AnalysisPage({ token }) {
   const [selectedDate, setSelectedDate] = useState(null);
 
   function loadOutfits() {
-    fetchOutfits()
+    fetchMyOutfits(token)
       .then(setOutfits)
       .catch((e) => console.error(e));
   }
 
   useEffect(() => {
     loadOutfits();
-  }, []);
+  }, [token]);
 
   function openDetail(dateKey) {
     setSelectedDate(dateKey);

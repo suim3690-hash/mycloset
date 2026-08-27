@@ -61,7 +61,8 @@ public class AuthService {
         return sanitize(user);
     }
 
-    public AppUser updateProfile(String token, String displayName, String bio, MultipartFile avatar) {
+    public AppUser updateProfile(
+            String token, String displayName, String bio, MultipartFile avatar, MultipartFile cover) {
         Long userId = authMapper.findUserIdByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("로그인이 필요해요"));
         AppUser existing = authMapper.findUserById(userId)
@@ -71,7 +72,8 @@ public class AuthService {
         update.setId(userId);
         update.setDisplayName(displayName == null || displayName.isBlank() ? existing.getDisplayName() : displayName);
         update.setBio(bio);
-        update.setAvatarPath(avatar != null && !avatar.isEmpty() ? saveAvatar(avatar) : existing.getAvatarPath());
+        update.setAvatarPath(avatar != null && !avatar.isEmpty() ? saveImage(avatar) : existing.getAvatarPath());
+        update.setCoverPath(cover != null && !cover.isEmpty() ? saveImage(cover) : existing.getCoverPath());
 
         authMapper.updateProfile(update);
         return sanitize(authMapper.findUserById(userId).orElseThrow());
@@ -95,6 +97,7 @@ public class AuthService {
         publicUser.setDisplayName(user.getDisplayName());
         publicUser.setBio(user.getBio());
         publicUser.setAvatarPath(user.getAvatarPath());
+        publicUser.setCoverPath(user.getCoverPath());
         return publicUser;
     }
 
@@ -122,18 +125,18 @@ public class AuthService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private String saveAvatar(MultipartFile avatar) {
+    private String saveImage(MultipartFile image) {
         try {
             Files.createDirectories(uploadDir);
-            String original = avatar.getOriginalFilename();
+            String original = image.getOriginalFilename();
             String extension = original != null && original.contains(".")
                     ? original.substring(original.lastIndexOf('.'))
                     : ".jpg";
             String fileName = UUID.randomUUID() + extension;
-            Files.copy(avatar.getInputStream(), uploadDir.resolve(fileName));
+            Files.copy(image.getInputStream(), uploadDir.resolve(fileName));
             return fileName;
         } catch (IOException e) {
-            throw new IllegalStateException("프로필 사진 저장에 실패했습니다", e);
+            throw new IllegalStateException("이미지 저장에 실패했습니다", e);
         }
     }
 }

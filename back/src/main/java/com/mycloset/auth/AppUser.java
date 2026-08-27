@@ -16,5 +16,6 @@ public class AppUser {
     private String displayName;
     private String bio;
     private String avatarPath;
+    private String coverPath;
     private LocalDateTime createdAt;
 }

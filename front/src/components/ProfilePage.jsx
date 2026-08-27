@@ -29,10 +29,13 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(user.displayName);
   const [draftBio, setDraftBio] = useState(user.bio || '');
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
+  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [isSavingCover, setIsSavingCover] = useState(false);
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [gridTab, setGridTab] = useState('posts');
@@ -66,7 +69,7 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
   }, [outfits, myPosts, savedOutfits]);
 
   const handle = useMemo(() => `@${(user.email || 'my_closet').split('@')[0]}`, [user.email]);
-  const coverPhoto = outfits?.[0]?.photoPath;
+  const coverPhotoUrl = coverPreview || (user.coverPath ? photoUrl(user.coverPath) : null);
 
   const topLooks = useMemo(() => {
     if (!analyses) return [];
@@ -85,17 +88,8 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
   function startEditing() {
     setDraftName(user.displayName);
     setDraftBio(user.bio || '');
-    setAvatarFile(null);
-    setAvatarPreview(null);
     setError(null);
     setEditing(true);
-  }
-
-  function handleAvatarChange(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
   }
 
   async function saveProfile() {
@@ -105,7 +99,6 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
       const updated = await updateProfile(token, {
         displayName: draftName.trim() || user.displayName,
         bio: draftBio.trim(),
-        avatarFile,
       });
       onProfileUpdated(updated);
       setEditing(false);
@@ -113,6 +106,38 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
       setError(e.message);
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function handleAvatarChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarPreview(URL.createObjectURL(file));
+    setIsSavingAvatar(true);
+    try {
+      const updated = await updateProfile(token, { avatarFile: file });
+      onProfileUpdated(updated);
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setIsSavingAvatar(false);
+      setAvatarPreview(null);
+    }
+  }
+
+  async function handleCoverChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverPreview(URL.createObjectURL(file));
+    setIsSavingCover(true);
+    try {
+      const updated = await updateProfile(token, { coverFile: file });
+      onProfileUpdated(updated);
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setIsSavingCover(false);
+      setCoverPreview(null);
     }
   }
 
@@ -133,10 +158,15 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
 
       <div className="page">
         <div
-          className={`profile-cover ${coverPhoto ? '' : 'profile-cover-fallback'}`}
-          style={coverPhoto ? { backgroundImage: `url(${photoUrl(coverPhoto)})` } : undefined}
+          className={`profile-cover ${coverPhotoUrl ? '' : 'profile-cover-fallback'}`}
+          style={coverPhotoUrl ? { backgroundImage: `url(${coverPhotoUrl})` } : undefined}
         >
-          <label className="profile-avatar" style={{ cursor: editing ? 'pointer' : 'default' }}>
+          <label className="profile-cover-edit-btn" aria-label="배경 사진 변경">
+            <span className="material-symbol">{isSavingCover ? 'hourglass_top' : 'photo_camera'}</span>
+            <input type="file" accept="image/*" onChange={handleCoverChange} hidden disabled={isSavingCover} />
+          </label>
+
+          <label className="profile-avatar">
             {avatarPreview || user.avatarPath ? (
               <img
                 src={avatarPreview || photoUrl(user.avatarPath)}
@@ -146,14 +176,10 @@ export default function ProfilePage({ user, token, onProfileUpdated, onLogout })
             ) : (
               <span className="material-symbol">checkroom</span>
             )}
-            {editing && (
-              <>
-                <span className="profile-avatar-edit-badge">
-                  <span className="material-symbol">photo_camera</span>
-                </span>
-                <input type="file" accept="image/*" onChange={handleAvatarChange} hidden />
-              </>
-            )}
+            <span className="profile-avatar-edit-badge">
+              <span className="material-symbol">{isSavingAvatar ? 'hourglass_top' : 'photo_camera'}</span>
+            </span>
+            <input type="file" accept="image/*" onChange={handleAvatarChange} hidden disabled={isSavingAvatar} />
           </label>
         </div>
 
