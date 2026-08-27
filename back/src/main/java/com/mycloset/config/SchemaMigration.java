@@ -16,6 +16,16 @@ public class SchemaMigration implements ApplicationRunner {
             "ALTER TABLE outfit_record ADD COLUMN IF NOT EXISTS user_id BIGINT",
             "ALTER TABLE outfit_record ADD COLUMN IF NOT EXISTS is_shared SMALLINT DEFAULT 0 NOT NULL",
             "ALTER TABLE app_user ADD COLUMN IF NOT EXISTS cover_path VARCHAR(255)",
+            "CREATE SEQUENCE IF NOT EXISTS wardrobe_item_seq START WITH 1 INCREMENT BY 1",
+            """
+            CREATE TABLE IF NOT EXISTS wardrobe_item (
+                id          BIGINT PRIMARY KEY,
+                outfit_id   BIGINT NOT NULL,
+                user_id     BIGINT NOT NULL,
+                items_json  VARCHAR(1000) NOT NULL,
+                created_at  TIMESTAMP DEFAULT now() NOT NULL
+            )
+            """,
     };
 
     private final JdbcTemplate jdbcTemplate;

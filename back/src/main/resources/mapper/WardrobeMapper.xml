@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycloset.wardrobe.WardrobeMapper">
+
+    <insert id="insert" parameterType="com.mycloset.wardrobe.WardrobeItem">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT nextval('wardrobe_item_seq')
+        </selectKey>
+        INSERT INTO wardrobe_item (id, outfit_id, user_id, items_json, created_at)
+        VALUES (#{id}, #{outfitId}, #{userId}, #{itemsJson}, now())
+    </insert>
+
+    <select id="findByUserId" resultType="com.mycloset.wardrobe.WardrobeItem">
+        SELECT w.id, w.outfit_id, w.user_id, w.items_json, w.created_at,
+               o.photo_path, o.record_date
+        FROM wardrobe_item w
+        JOIN outfit_record o ON o.id = w.outfit_id
+        WHERE w.user_id = #{userId}
+        ORDER BY o.record_date DESC, w.id DESC
+    </select>
+
+</mapper>

@@ -15,17 +15,24 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mycloset.auth.AuthService;
+import com.mycloset.wardrobe.WardrobeService;
 
 @Service
 public class OutfitService {
 
     private final OutfitMapper outfitMapper;
     private final AuthService authService;
+    private final WardrobeService wardrobeService;
     private final Path uploadDir;
 
-    public OutfitService(OutfitMapper outfitMapper, AuthService authService, @Value("${app.upload-dir}") String uploadDir) {
+    public OutfitService(
+            OutfitMapper outfitMapper,
+            AuthService authService,
+            WardrobeService wardrobeService,
+            @Value("${app.upload-dir}") String uploadDir) {
         this.outfitMapper = outfitMapper;
         this.authService = authService;
+        this.wardrobeService = wardrobeService;
         this.uploadDir = Path.of(uploadDir);
     }
 
@@ -54,6 +61,7 @@ public class OutfitService {
         outfit.setIsMain(hasExisting ? 0 : 1);
 
         outfitMapper.insert(outfit);
+        wardrobeService.classifyAndSave(outfit);
         return outfit;
     }
 

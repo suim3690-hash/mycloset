@@ -3,6 +3,7 @@ import MonthGrid from './MonthGrid';
 import OutfitListView from './OutfitListView';
 import CaptureModal from './CaptureModal';
 import ShareSheet from './ShareSheet';
+import MyClosetPage from './MyClosetPage';
 import { fetchMyOutfits } from '../api/outfitApi';
 
 function parseRecordDate(recordDate) {
@@ -19,6 +20,7 @@ export default function CalendarPage({ token }) {
   const [outfits, setOutfits] = useState([]);
   const [modalDate, setModalDate] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [closetOpen, setClosetOpen] = useState(false);
 
   useEffect(() => {
     loadOutfits();
@@ -47,6 +49,10 @@ export default function CalendarPage({ token }) {
   }
 
   const monthLabel = displayedMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  if (closetOpen) {
+    return <MyClosetPage token={token} onBack={() => setClosetOpen(false)} />;
+  }
 
   return (
     <div>
@@ -96,6 +102,17 @@ export default function CalendarPage({ token }) {
         ) : (
           <OutfitListView outfits={outfits} onItemClick={(recordDate) => setModalDate(parseRecordDate(recordDate))} />
         )}
+
+        <button className="blob-card closet-trigger" onClick={() => setClosetOpen(true)}>
+          <span className="closet-trigger-icon">
+            <span className="material-symbol">checkroom</span>
+          </span>
+          <span className="closet-trigger-text">
+            <span className="closet-trigger-title">나의 옷장 들어가기</span>
+            <span className="closet-trigger-subtitle">기록한 코디에서 AI가 자동으로 정리해둔 아이템을 봐요</span>
+          </span>
+          <span className="material-symbol">chevron_right</span>
+        </button>
       </div>
 
       <button className="fab" onClick={() => setModalDate(new Date())}>

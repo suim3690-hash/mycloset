@@ -122,3 +122,13 @@ CREATE TABLE style_profile (
 );
 
 CREATE SEQUENCE style_profile_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE wardrobe_item (
+    id          BIGINT PRIMARY KEY,
+    outfit_id   BIGINT NOT NULL,
+    user_id     BIGINT NOT NULL,
+    items_json  VARCHAR(1000) NOT NULL,
+    created_at  TIMESTAMP DEFAULT now() NOT NULL
+);
+
+CREATE SEQUENCE wardrobe_item_seq START WITH 1 INCREMENT BY 1;
