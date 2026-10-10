@@ -79,6 +79,7 @@ CREATE TABLE app_user (
     bio           VARCHAR(100),
     avatar_path   VARCHAR(255),
     cover_path    VARCHAR(255),
+    is_admin      BOOLEAN DEFAULT FALSE NOT NULL,
     created_at    TIMESTAMP DEFAULT now() NOT NULL
 );
 

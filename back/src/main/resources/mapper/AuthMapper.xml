@@ -11,13 +11,13 @@
     </insert>
 
     <select id="findUserByEmail" resultType="com.mycloset.auth.AppUser">
-        SELECT id, email, password_hash, display_name, bio, avatar_path, cover_path, created_at
+        SELECT id, email, password_hash, display_name, bio, avatar_path, cover_path, is_admin, created_at
         FROM app_user
         WHERE email = #{email}
     </select>
 
     <select id="findUserById" resultType="com.mycloset.auth.AppUser">
-        SELECT id, email, password_hash, display_name, bio, avatar_path, cover_path, created_at
+        SELECT id, email, password_hash, display_name, bio, avatar_path, cover_path, is_admin, created_at
         FROM app_user
         WHERE id = #{id}
     </select>

@@ -17,5 +17,6 @@ public class AppUser {
     private String bio;
     private String avatarPath;
     private String coverPath;
+    private boolean isAdmin;
     private LocalDateTime createdAt;
 }

@@ -56,6 +56,34 @@
   text-transform: uppercase;
 }
 
+.top-bar-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-bar-calendar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--olive);
+  opacity: 0.75;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.top-bar-calendar-btn:hover {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.top-bar-calendar-btn .material-symbol {
+  font-size: 20px;
+}
+
 .icon-btn {
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.22);
@@ -214,6 +242,172 @@
   padding: 0 3px;
   border-radius: 2px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+/* Day view */
+.day-view-label {
+  font-size: 22px;
+}
+
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.week-day-col {
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+
+.week-day-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: var(--olive);
+}
+
+.week-day-today-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.week-day-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  border: 1.5px solid var(--glass-border);
+  background: var(--card);
+}
+
+.week-day-circle.recorded {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--accent-ink);
+}
+
+.week-day-circle.is-today {
+  border-color: var(--lime);
+}
+
+.week-day-circle.selected {
+  box-shadow: 0 0 0 2.5px var(--ink);
+}
+
+.day-view-empty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 20px;
+  border: 1.5px dashed var(--glass-border);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--olive);
+  font-size: 14px;
+  text-align: center;
+}
+
+.day-view-empty .material-symbol {
+  font-size: 32px;
+}
+
+.day-view-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.day-view-card {
+  border: 1px solid var(--glass-border);
+  background: var(--card);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(31, 38, 20, 0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.day-view-card-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+}
+
+.day-view-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.day-view-card-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.day-view-card-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-view-card-category {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.day-view-card-memo {
+  font-size: 12px;
+  color: var(--olive-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-view-card-add {
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  aspect-ratio: 3 / 4.6;
+  border-style: dashed;
+  color: var(--olive);
+  font-size: 13px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.day-view-card-add .material-symbol {
+  font-size: 26px;
 }
 
 /* FAB */
@@ -478,9 +672,8 @@
   max-width: 320px;
   aspect-ratio: 3 / 4;
   border: 1px solid var(--glass-border);
-  border-radius: 135px 120px 120px 135px;
+  border-radius: 16px;
   box-shadow: 0 10px 28px rgba(31, 38, 20, 0.16);
-  transform: rotate(1deg);
   background: var(--card);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
@@ -507,6 +700,81 @@
   font-size: 52px;
   color: var(--olive);
   opacity: 0.5;
+}
+
+.photo-crop-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.photo-crop-frame {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(31, 38, 20, 0.16);
+  background: var(--card);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.photo-crop-frame:active {
+  cursor: grabbing;
+}
+
+.photo-crop-frame img {
+  user-select: none;
+  pointer-events: none;
+}
+
+.photo-crop-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.photo-crop-zoom-row .material-symbol {
+  font-size: 18px;
+  color: var(--olive);
+  flex-shrink: 0;
+}
+
+.photo-crop-zoom-slider {
+  flex: 1;
+  accent-color: var(--accent-strong);
+}
+
+.photo-crop-hint {
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+}
+
+.photo-crop-change-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.photo-crop-change-btn .material-symbol {
+  font-size: 16px;
 }
 
 .photo-thumb-row {

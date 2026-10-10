@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FILTERS } from '../constants/filters';
 import { registerOutfit, fetchOutfitsByDateAll, setMainOutfit, updateOutfitDetails, deleteOutfit, photoUrl } from '../api/outfitApi';
@@ -6,6 +6,7 @@ import { reverseGeocode, getCurrentLocation } from '../api/geoApi';
 import { LOOK_CATEGORIES } from '../constants/lookCategories';
 import { toDateKey } from '../utils/date';
 import ShareSheet from './ShareSheet';
+import PhotoCropper from './PhotoCropper';
 
 function filterCss(filterKey) {
   return FILTERS.find((f) => f.key === filterKey)?.css ?? 'none';
@@ -118,6 +119,7 @@ export default function CaptureModal({ date, token, onClose, onSaved, initialMod
 
   const [error, setError] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const cropperRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -241,6 +243,7 @@ export default function CaptureModal({ date, token, onClose, onSaved, initialMod
     setIsSaving(true);
     setError(null);
     try {
+      const croppedFile = await cropperRef.current.exportCroppedFile(photoFile.name || 'outfit.jpg');
       const saved = await registerOutfit(token, {
         recordDate: dateKey,
         filterType: filterKey,
@@ -248,7 +251,7 @@ export default function CaptureModal({ date, token, onClose, onSaved, initialMod
         itemTags: itemTags.join(','),
         lookCategory: lookCategories.join(','),
         location,
-        photoFile,
+        photoFile: croppedFile,
       });
       const refreshed = await fetchOutfitsByDateAll(token, dateKey);
       setExistingOutfits(refreshed);
@@ -484,17 +487,24 @@ export default function CaptureModal({ date, token, onClose, onSaved, initialMod
 
           {existingOutfits !== undefined && mode === 'add' && (
             <>
-              <label className="photo-drop" style={{ filter: previewUrl ? filterCss(filterKey) : 'none' }}>
-                {previewUrl ? (
-                  <img src={previewUrl} alt="선택한 사진" />
-                ) : (
+              {previewUrl ? (
+                <>
+                  <PhotoCropper ref={cropperRef} src={previewUrl} filterCss={filterCss(filterKey)} />
+                  <label className="photo-crop-change-btn">
+                    <span className="material-symbol">photo_camera</span>
+                    다른 사진 선택
+                    <input type="file" accept="image/*" onChange={handleFileChange} hidden />
+                  </label>
+                </>
+              ) : (
+                <label className="photo-drop">
                   <div className="photo-drop-placeholder">
                     <span className="material-symbol">photo_camera</span>
                     <span className="text-soft">사진을 추가해주세요</span>
                   </div>
-                )}
-                <input type="file" accept="image/*" onChange={handleFileChange} hidden />
-              </label>
+                  <input type="file" accept="image/*" onChange={handleFileChange} hidden />
+                </label>
+              )}
 
               <div className="filter-row">
                 {FILTERS.map((filter) => (
